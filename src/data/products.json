@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "name": "Procesador Intel Core i9-12900K",
+        "price": 589,
+        "description": "Un procesador de alto rendimiento",
+        "category": "Procesadores"
+    },
+    {
+        "id": 2,
+        "name": "Tarjeta Gráfica NVIDIA GeForce RTX 3080",
+        "price": 799,
+        "description": "Tarjeta gráfica para gaming",
+        "category": "Tarjetas Gráficas"
+    },
+    {
+        "id": 3,
+        "name": "Placa Base ASUS ROG Strix Z690-E",
+        "price": 299,
+        "description": "Placa base de alto rendimiento",
+        "category": "Placas Base"
+    }
+]

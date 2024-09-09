@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Productos en Tiempo Real</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #product-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        #product-list li {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        #add-product-form {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Productos en Tiempo Real</h1>
+    <ul id="product-list">
+        {{#if products.length}}
+            {{#each products}}
+                <li id="product-{{this.id}}">
+                    <strong>Nombre:</strong> {{this.name}} <br>
+                    <strong>Precio:</strong> ${{this.price}} <br>
+                    <strong>ID:</strong> {{this.id}} <br>
+                    <strong>Categoría:</strong> {{this.category}} <br>
+                    <strong>Descripción:</strong> {{this.description}} <br>
+                </li>
+            {{/each}}
+        {{else}}
+            <li>No hay productos disponibles.</li>
+        {{/if}}
+    </ul>
+
+    <!-- Formulario para agregar un nuevo producto (Opcional) -->
+    <div id="add-product-form">
+        <h2>Agregar Nuevo Producto</h2>
+        <form id="product-form">
+            <label for="name">Nombre:</label><br>
+            <input type="text" id="name" name="name" required><br><br>
+            
+            <label for="price">Precio:</label><br>
+            <input type="number" id="price" name="price" required><br><br>
+            
+            <label for="category">Categoría:</label><br>
+            <input type="text" id="category" name="category" required><br><br>
+            
+            <label for="description">Descripción:</label><br>
+            <textarea id="description" name="description" required></textarea><br><br>
+            
+            <button type="submit">Agregar Producto</button>
+        </form>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        // Escuchar la lista completa de productos
+        socket.on('updateProducts', (products) => {
+            const productList = document.getElementById('product-list');
+            productList.innerHTML = ''; // Limpiar la lista
+
+            if (products.length) {
+                products.forEach(product => {
+                    const li = document.createElement('li');
+                    li.id = `product-${product.id}`;
+                    li.innerHTML = `
+                        <strong>Nombre:</strong> ${product.name} <br>
+                        <strong>Precio:</strong> $${product.price} <br>
+                        <strong>ID:</strong> ${product.id} <br>
+                        <strong>Categoría:</strong> ${product.category} <br>
+                        <strong>Descripción:</strong> ${product.description} <br>
+                    `;
+                    productList.appendChild(li);
+                });
+            } else {
+                productList.innerHTML = '<li>No hay productos disponibles.</li>';
+            }
+        });
+
+        // (Opcional) Manejar el formulario para agregar un nuevo producto
+        const productForm = document.getElementById('product-form');
+        productForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const newProduct = {
+                name: document.getElementById('name').value,
+                price: parseFloat(document.getElementById('price').value),
+                category: document.getElementById('category').value,
+                description: document.getElementById('description').value
+            };
+
+            try {
+                const response = await fetch('/api/products', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newProduct)
+                });
+
+                if (response.ok) {
+                    // Limpiar el formulario
+                    productForm.reset();
+                } else {
+                    console.error('Error al agregar el producto');
+                }
+            } catch (error) {
+                console.error('Error al agregar el producto:', error);
+            }
+        });
+    </script>
+</body>
+</html>
